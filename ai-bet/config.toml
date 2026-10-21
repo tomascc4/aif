@@ -1,0 +1,66 @@
+# OCTO BET — configuração
+# Campeonatos com histórico completo (football-data.co.uk): P1 Liga Portugal, E0 Premier League,
+# SP1 La Liga, I1 Serie A, D1 Bundesliga, F1 Ligue 1, N1 Eredivisie.
+# As competições europeias e as taças vêm da Odds API (ver [odds_api]).
+leagues = ["P1", "E0", "SP1", "I1", "D1", "F1", "N1"]
+seasons = 4               # épocas de histórico (inclui a atual)
+days_ahead = 7            # previsões para os jogos dos próximos N dias
+
+[llm]
+backend = "claude"        # claude | codex | mock
+model = "sonnet"          # analista de notícias e advogado do diabo
+pm_model = "opus"         # presidente (fecha o boletim)
+scout_model = "sonnet"    # radar, médico e repórter (com pesquisa web)
+adjuster_samples = 3      # palpites independentes do analista (fica a mediana)
+max_deep_matches = 8      # jogos que recebem batedores (é aqui que se gasta quota)
+deep_window_hours = 72    # só analisa a fundo jogos que começam nas próximas N horas
+scout_timeout = 420
+parallel = 3
+
+[boletim]
+pick_window_hours = 72    # o boletim usa jogos das próximas N horas
+singles = 5               # apostas simples
+max_same_market = 2       # no máximo 2 apostas do mesmo tipo de mercado (variedade)
+min_edge = 0.03           # "valor": odd real com pelo menos 3% de valor esperado
+solid_min_prob = 0.55     # "sólida": pelo menos 55% e o sistema concorda com o mercado (ou está acima)
+solid_tolerance = 0.01
+safe_min_prob = 0.72      # "as mais prováveis": pelo menos 72% de probabilidade
+safe_count = 5
+max_disagree = 0.08       # não recomendar se discordarmos do mercado mais do que isto (sem notícia)
+min_prob = 0.33
+min_odds = 1.25
+max_odds = 4.5
+multi_odds = [2.0, 5.5]   # intervalo da odd total da múltipla
+multi_min_prob = 0.58     # cada seleção da múltipla tem de ter pelo menos esta probabilidade
+
+[blend]                   # peso de cada fonte nos golos esperados
+mercado = 0.70            # o mercado é a melhor estimativa que existe
+xg = 0.15                 # xG real do Understat (5 grandes ligas)
+dc = 0.05
+sot = 0.05
+elo = 0.05                # só entra em jogos entre ligas
+
+[quant]
+xi = 0.0019               # decaimento temporal do Dixon-Coles (por dia; ~1 ano de meia-vida)
+window_days = 1100
+sot_alpha = 0.4           # peso dos golos reais nos "golos sintéticos" (o resto vem dos remates enquadrados)
+devig = "shin"
+sharp_book = "PS"         # Pinnacle = referência do mercado
+news_weight = 0.8         # quanto do ajuste das notícias passa para os golos esperados
+
+[odds_api]
+# Chave grátis em https://the-odds-api.com (500 créditos/mês). Guarda-a com: python -m bet setup-odds
+regions = "eu"
+extra_markets = "btts,spreads"   # ambas marcam + handicap asiático, só nos jogos analisados a fundo
+reserve = 40                     # para de gastar quando restarem menos créditos do que isto
+cache_hours = 2
+sports = [
+  "soccer_portugal_primeira_liga", "soccer_epl", "soccer_spain_la_liga", "soccer_italy_serie_a",
+  "soccer_germany_bundesliga", "soccer_france_ligue_one", "soccer_netherlands_eredivisie",
+  "soccer_uefa_champs_league", "soccer_uefa_europa_league", "soccer_uefa_europa_conference_league",
+  "soccer_fa_cup", "soccer_england_efl_cup", "soccer_spain_copa_del_rey", "soccer_italy_coppa_italia",
+  "soccer_germany_dfb_pokal", "soccer_france_coupe_de_france",
+]
+
+[dashboard]
+port = 8790
